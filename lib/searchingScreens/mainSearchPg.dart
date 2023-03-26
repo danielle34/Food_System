@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:food_system/logOnPg.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -23,11 +25,13 @@ class _mainSearchPage extends State<mainSearchPage> {
   final typedLocation = TextEditingController();
 
   Future<List> getLocation(String theGivenLocation) async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    double Lati = position.latitude;
-    double Lani = position.longitude;
+    List<Location> locations = await locationFromAddress(theGivenLocation);
+    double Lati = 38.8951;
+    double Lani = -77.0364;
+    Lati = locations.first.latitude;
+    Lani = locations.first.longitude;
+    List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+
     //print((Lati).toString(),"ummmm",(Lani).toString());
     // print(position);
     // print(Lati);
@@ -35,14 +39,36 @@ class _mainSearchPage extends State<mainSearchPage> {
     // List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
     // print(placemarks);
     //print((position).toString());
-
-    List<Location> locations = await locationFromAddress(theGivenLocation);
-    print("Address to Lat long ${locations.first.latitude} : ${locations.first.longitude}");
-    setState(() {
+    /*
+    List<Location>? locations;
+    if (theGivenLocation== ""){
+    theGivenLocation ="1827 University Ave Charlottesville, VA 22903 United States";
+    }
+    try {
+      locations = await locationFromAddress(theGivenLocation);
       Lati = locations.first.latitude;
       Lani = locations.first.longitude;
-    });
+      List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+
+    } on Exception catch(_){
+      print("ummmmm");
+      LocationPermission permission = await Geolocator.requestPermission();
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      locations = await locationFromAddress("1827 University Ave Charlottesville, VA 22903 United States");
+      Lati = locations.first.latitude;
+      Lani = locations.first.longitude;
+
+      Lati = position.latitude;
+    }
     List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+*/
+    //print("Address to Lat long ${locations.first.latitude} : ${locations.first.longitude}");
+
+    setState(() {
+
+    });
     // print(locations);
     // print(placemarks);
 
@@ -51,6 +77,8 @@ class _mainSearchPage extends State<mainSearchPage> {
     //       setState(() {});
     //     });
     // return [theGivenLocation,Lati, Lani, placemarks] ;
+    print(placemarks.first);
+    print(locations.first.latitude);
 
     return [placemarks,locations ];
 
