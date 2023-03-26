@@ -17,38 +17,52 @@ class mainSearchPage extends StatefulWidget {
 }
 
 class _mainSearchPage extends State<mainSearchPage> {
-  double Lati = 0;
-  double Lani = 0;
+  // double Lati = 0;
+  // double Lani = 0;
+  List placeData= [];
   final typedLocation = TextEditingController();
 
   Future<List> getLocation(String theGivenLocation) async {
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    Lati = position.latitude;
-    Lani = position.longitude;
+    double Lati = position.latitude;
+    double Lani = position.longitude;
     //print((Lati).toString(),"ummmm",(Lani).toString());
-    print(position);
-    print(Lati);
-    print(Lani);
-    List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
-    print(placemarks);
+    // print(position);
+    // print(Lati);
+    // print(Lani);
+    // List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+    // print(placemarks);
     //print((position).toString());
 
     List<Location> locations = await locationFromAddress(theGivenLocation);
     print("Address to Lat long ${locations.first.latitude} : ${locations.first.longitude}");
-
     setState(() {
       Lati = locations.first.latitude;
       Lani = locations.first.longitude;
-
     });
-    return [theGivenLocation,Lati, Lani, placemarks] ;
+    List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+    // print(locations);
+    // print(placemarks);
+
+    // await Future.delayed(const Duration(milliseconds: 10),
+    //         () {
+    //       setState(() {});
+    //     });
+    // return [theGivenLocation,Lati, Lani, placemarks] ;
+
+    return [placemarks,locations ];
+
+  }
+  void transferData(theGivenLocation) async {
+    placeData = await getLocation(typedLocation.text);//getLocation(theGivenLocation);
   }
 
   void initState() {
     setState(() {});
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,16 +128,15 @@ class _mainSearchPage extends State<mainSearchPage> {
             child: TextButton(
               style: TextButton.styleFrom(backgroundColor: Colors.pink),
               onPressed: () {
-                print("pushed");
                 //getLocation(typedLocation.text);
 
                 List newReturnList =[];
 
-
+                transferData(typedLocation.text);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  communityCard(typedLocation.text,widget.PersonUserName),
+                        builder: (context) =>  communityCard(typedLocationList: placeData,PersonUserName: widget.PersonUserName),
                         fullscreenDialog: true));
                 //typedLocation
                 setState(() {});
