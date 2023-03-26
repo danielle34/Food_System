@@ -10,9 +10,11 @@ import 'package:food_system/infoScreens/communityCard.dart';
 import 'package:food_system/searchingScreens/mainSearchPg.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:network_image_search/network_image_search.dart';
-
-bool methodRan = false;
-
+import 'package:openfoodfacts/openfoodfacts.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:math';
+import 'package:food_system/infoScreens/foodAvi.dart';
 class communityCard extends StatefulWidget {
   final List<dynamic> typedLocationList;
   String PersonUserName;
@@ -21,88 +23,38 @@ class communityCard extends StatefulWidget {
       {required this.typedLocationList, required this.PersonUserName});
 
   @override
-
-
   _communityCard createState() => _communityCard();
 }
 
 class _communityCard extends State<communityCard> {
-//class LogOnPage extends StatelessWidget {
-  //const MyApp({super.key});
-  // double Lati = 30;
-  // double Lani = 30;
- // List placeData = [];
- // Future.delayed(Duration.zero, () => yourFunc(context));
-
   Future getLocation() async {
     await widget.typedLocationList;
-
-    // LocationPermission permission = await Geolocator.requestPermission();
-    // Position position = await Geolocator.getCurrentPosition(
-    //     desiredAccuracy: LocationAccuracy.high);
-    // Lati = position.latitude;
-    // Lani = position.longitude;
-    // print(position);
-    // print(Lati);
-    // print(Lani);
-    // List<Placemark> placemarks = await placemarkFromCoordinates(Lati, Lani);
-    // print(placemarks);
-    //
-    // List<Location> locations = await locationFromAddress(theGivenLocation);
-    // print(
-    //     "Address to Lat long ${locations.first.latitude} : ${locations.first.longitude}");
-    //
-    // setState(() {
-    //   Lati = locations.first.latitude;
-    //   Lani = locations.first.longitude;
-    // });
-    // await Future.delayed((Duration(seconds: 3)));
   }
 
   void initState() {
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
     setState(() {
-       getLocation();
+      getLocation();
+      transferData();
     });
     setState(() {});
 
     setState(() {});
   }
 
+  List heartColor = [Colors.black, Colors.pink];
+  int heartColorIndi = 0;
+  List listOfFoods = [];
+  List topTen = [];
 
 
-  // @override
-  // void dipose() {
-  //   super.dispose();
-  // }
+  String commadedWords = "";
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: BottomNavigationBar(
-      //   backgroundColor: Colors.black,
-      //   type: BottomNavigationBarType.fixed,
-      //   //even spaced out
-      //   selectedItemColor: Colors.white,
-      //   unselectedItemColor: Colors.grey,
-      //   selectedFontSize: 20,
-      //   items: const <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.feed),
-      //       label: 'main ',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.feed),
-      //       label: 'main ',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.feed),
-      //       label: 'main ',
-      //     ),
-      //   ],
-      // ),
       body: ListView(
         children: [
           Container(
@@ -127,23 +79,72 @@ class _communityCard extends State<communityCard> {
             child: Unsplash(
               width: '720',
               height: '360',
-              category: '${widget.typedLocationList[0].first.locality}',
-              subcategory: '${widget.typedLocationList[0].first.administrativeArea}',
+              category: '${widget.typedLocationList[0].first.locality} town',
+              subcategory:
+                  '${widget.typedLocationList[0].first.administrativeArea} city ',
             ),
           ),
-    Container(
-      height: 100,
-    ),
+          Row(
+            children:  <Widget>[
 
+              Container(
+                padding: EdgeInsets.all(20),
+                child: GestureDetector(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Icon(
+                      Icons.favorite,
+                      color: heartColor[heartColorIndi % 2],
+                      size: 40,
+                    ),
+                  ),
+                  onTapDown: (details) {
+                    setState(() {
+                      heartColorIndi++;
+                      getListIngredienets();
+                    });
+                  },
+                ),
+              ),
+              SizedBox(width: 150), // give it width
+
+              TextButton(
+                style: TextButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => foodLists(topTen),
+                      ));
+                },
+                child: Text(
+                  'Food Options',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+
+
+
+          Container(
+            height: 50,
+          ),
           Container(
             padding: EdgeInsets.all(20.0),
             child: Text(
-              "Food items such as : Bananas, Carrots, Broccoli, Brussel sprouts, Potatoes, Chicken and more.  The following meals can be made with these items: Broccoli cheddar soup Roasted Chicken Sumac Chicken Lemon Israeli Couscous",
+              "Food items such as " + commadedWords,
               textScaleFactor: 3,
-           style: TextStyle(fontSize: 4),
+              style: TextStyle(fontSize: 7),
             ),
           ),
-    Container(
+          //makeListOptions(),
+          Container(
             // here
             height: 500,
             alignment: Alignment.centerLeft,
@@ -175,17 +176,24 @@ class _communityCard extends State<communityCard> {
 
   Widget checkInfo() {
     String theText = "Try Again Please";
-    try {
-      setState(() {});
-
-      print("yayeyeyeaaa");
-      print(widget.typedLocationList);
+    if (widget.typedLocationList[0].first.name == "24590") {
       return Container(
         padding: EdgeInsets.all(20.0),
         child: Text(
-          "${widget.typedLocationList[0].first.locality}, ${widget.typedLocationList[0].first.administrativeArea} ${widget.PersonUserName}",
-          textScaleFactor: 3,)
+          "Try Again Please",
+          textScaleFactor: 3,
+        ),
       );
+    }
+    try {
+      setState(() {});
+
+      return Container(
+          padding: EdgeInsets.all(20.0),
+          child: Text(
+            "${widget.typedLocationList[0].first.locality}, ${widget.typedLocationList[0].first.administrativeArea} ",
+            textScaleFactor: 3,
+          ));
     } on Exception catch (_) {
       return Container(
         padding: EdgeInsets.all(20.0),
@@ -196,33 +204,72 @@ class _communityCard extends State<communityCard> {
       );
     }
   }
-}
-/*
-print(widget.typedLocationList);
-      if ((widget.typedLocationList[1]).length == 0) {
-        return Container(
-          padding: EdgeInsets.all(20.0),
-          child: Text(
-            "Try Again Please",
-            textScaleFactor: 3,
-          ),);
-      }
 
-      theText = "${widget.typedLocationList[0].first.locality}, ${widget
-          .typedLocationList[0].first.administrativeArea} ${widget
-          .PersonUserName}";
-      if (widget.typedLocationList[0].first.locality == "90 State Cir") {
-        return Container(
-          padding: EdgeInsets.all(20.0),
-          child: Text(
-            "Try Again Please",
-            textScaleFactor: 3,
-          ),);
+  List<Widget> makeListOptions() {
+    List<Widget> listStuff = [];
+    for (var i = 0; i < topTen.length; i++) {
+      listStuff.add(
+        TextButton(
+          onPressed: () {
+            print(topTen[i]);
+          },
+          style: TextButton.styleFrom(
+            primary: Colors.black,
+          ),
+          child: Container(
+            height: 100,
+            child: FittedBox(
+              //fit: BoxFit.fitWidth,
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  topTen[i],
+                  style: TextStyle(
+                    fontSize: 40.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return listStuff;
+  }
+
+  static Future<List> getListIngredienets() async {
+    var uri = Uri.https('yummly2.p.rapidapi.com', '/feeds/list',
+        {"limit": "100", "start": "0", "tag": "list.recipe.popular"});
+
+    final response = await http.get(uri, headers: {
+      "x-rapidapi-key": "8ebd38dd1bmshc7b804ef8d01b64p1d9ecfjsn8d03d2a40171",
+      "x-rapidapi-host": "yummly2.p.rapidapi.com",
+      "useQueryString": "true"
+    });
+
+    Map<String, dynamic> data = jsonDecode(response.body);
+    List<dynamic> _temp = [];
+    for (var i in data['feed']) {
+      for (var j in i['content']['ingredientLines']) {
+        _temp.add(j['ingredient']);
       }
-      return Container(
-        padding: EdgeInsets.all(20.0),
-        child: Text(
-          theText,
-          textScaleFactor: 3,
-        ),);
- */
+    }
+
+    return _temp;
+  }
+
+  Future transferData() async {
+    listOfFoods = await getListIngredienets(); //getLocation(theGivenLocation);
+    int doubleRando = Random().nextInt(listOfFoods.length - 11);
+     topTen = listOfFoods.sublist(doubleRando, doubleRando + 10);
+    commadedWords = "";
+    for (var i in topTen) {
+      commadedWords += i + ", ";
+    }
+    setState(() {});
+  }
+}
