@@ -7,21 +7,24 @@ import 'package:latlng/latlng.dart';
 import 'package:latlong2/latlong.dart' as latLng;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:food_system/infoScreens/communityCard.dart';
-class mainSearchPage extends StatefulWidget {
-  mainSearchPage(this.PersonUserName);
-
+import 'package:food_system/searchingScreens/mainSearchPg.dart';
+class communityCard extends StatefulWidget {
+  communityCard(this.typedLocation, this.PersonUserName);
+  String typedLocation;
   String PersonUserName;
 
   @override
-  _mainSearchPage createState() => _mainSearchPage();
+  _communityCard createState() => _communityCard();
 }
 
-class _mainSearchPage extends State<mainSearchPage> {
+class _communityCard extends State<communityCard> {
+//class LogOnPage extends StatelessWidget {
+  //const MyApp({super.key});
   double Lati = 0;
   double Lani = 0;
-  final typedLocation = TextEditingController();
-
-  Future<List> getLocation(String theGivenLocation) async {
+  List placeData= [];
+  final myController = TextEditingController();
+  void getLocation(String theGivenLocation) async {
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -43,13 +46,12 @@ class _mainSearchPage extends State<mainSearchPage> {
       Lani = locations.first.longitude;
 
     });
-    return [theGivenLocation,Lati, Lani, placemarks] ;
   }
 
   void initState() {
     setState(() {});
   }
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,40 +74,39 @@ class _mainSearchPage extends State<mainSearchPage> {
             width: 400,
             height: 100,
             child: TextField(
-                style: TextStyle(
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+              //https://www.tutorialkart.com/flutter/flutter-textfield/
+              decoration: InputDecoration(
+                labelStyle: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
-                //https://www.tutorialkart.com/flutter/flutter-textfield/
-                decoration: InputDecoration(
-                  labelStyle: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  fillColor: Color.fromRGBO(255, 255, 255, 1.0),
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    borderSide: BorderSide(width: 2.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
+                fillColor: Color.fromRGBO(255, 255, 255, 1.0),
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  borderSide: BorderSide(width: 2.0),
                 ),
-              controller: typedLocation,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+              ),
+            ),
           ),
 
           Container(
@@ -120,11 +121,7 @@ class _mainSearchPage extends State<mainSearchPage> {
                 List newReturnList =[];
 
 
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>  communityCard(typedLocation.text,widget.PersonUserName),
-                        fullscreenDialog: true));
+
                 //typedLocation
                 setState(() {});
               },
@@ -147,30 +144,30 @@ class _mainSearchPage extends State<mainSearchPage> {
           //     ),
           //   ),
           // ),
-      Container(
-        // here
-        height: 500,
-        alignment: Alignment.centerLeft,
-        child: FlutterMap(
-          options: MapOptions(
-            center: latLng.LatLng(37.785834,-122.406417),//(Lati,Lani),//
-            zoom: 15,
+          Container(
+            // here
+            height: 500,
+            alignment: Alignment.centerLeft,
+            child: FlutterMap(
+              options: MapOptions(
+                center: latLng.LatLng(37.785834,-122.406417),//(Lati,Lani),//
+                zoom: 15,
+              ),
+              nonRotatedChildren: [
+                AttributionWidget.defaultWidget(
+                  source: 'OpenStreetMap contributors',
+                  onSourceTapped: null,
+                ),
+              ],
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.app',
+                ),
+              ],
+            )
+            ,
           ),
-          nonRotatedChildren: [
-            AttributionWidget.defaultWidget(
-              source: 'OpenStreetMap contributors',
-              onSourceTapped: null,
-            ),
-          ],
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.app',
-            ),
-          ],
-        )
-        ,
-      ),
 
         ],
       ),
