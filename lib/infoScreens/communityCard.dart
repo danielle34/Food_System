@@ -9,17 +9,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:food_system/infoScreens/communityCard.dart';
 import 'package:food_system/searchingScreens/mainSearchPg.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:network_image_search/network_image_search.dart';
 
 bool methodRan = false;
 
 class communityCard extends StatefulWidget {
-  List typedLocationList;
+  final List<dynamic> typedLocationList;
   String PersonUserName;
 
   communityCard(
       {required this.typedLocationList, required this.PersonUserName});
 
   @override
+
+
   _communityCard createState() => _communityCard();
 }
 
@@ -28,9 +31,12 @@ class _communityCard extends State<communityCard> {
   //const MyApp({super.key});
   // double Lati = 30;
   // double Lani = 30;
-  List placeData = [];
+ // List placeData = [];
+ // Future.delayed(Duration.zero, () => yourFunc(context));
 
-  Future getLocation(String theGivenLocation) async {
+  Future getLocation() async {
+    await widget.typedLocationList;
+
     // LocationPermission permission = await Geolocator.requestPermission();
     // Position position = await Geolocator.getCurrentPosition(
     //     desiredAccuracy: LocationAccuracy.high);
@@ -55,12 +61,21 @@ class _communityCard extends State<communityCard> {
 
   void initState() {
     super.initState();
+    WidgetsFlutterBinding.ensureInitialized();
+    setState(() {
+       getLocation();
+    });
+    setState(() {});
+
+    setState(() {});
   }
 
-  @override
-  void dipose() {
-    super.dispose();
-  }
+
+
+  // @override
+  // void dipose() {
+  //   super.dispose();
+  // }
 
   // This widget is the root of your application.
   @override
@@ -106,16 +121,29 @@ class _communityCard extends State<communityCard> {
             ),
           ),
           Center(
-              child: Container(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "${widget.typedLocationList[0].first.locality}, ${widget
-                      .typedLocationList[0].first.administrativeArea} ${widget
-                      .PersonUserName}",
-                  textScaleFactor: 3,
-                ),),
+            child: checkInfo(),
           ),
+          Center(
+            child: Unsplash(
+              width: '720',
+              height: '360',
+              category: '${widget.typedLocationList[0].first.locality}',
+              subcategory: '${widget.typedLocationList[0].first.administrativeArea}',
+            ),
+          ),
+    Container(
+      height: 100,
+    ),
+
           Container(
+            padding: EdgeInsets.all(20.0),
+            child: Text(
+              "Food items such as : Bananas, Carrots, Broccoli, Brussel sprouts, Potatoes, Chicken and more.  The following meals can be made with these items: Broccoli cheddar soup Roasted Chicken Sumac Chicken Lemon Israeli Couscous",
+              textScaleFactor: 3,
+           style: TextStyle(fontSize: 4),
+            ),
+          ),
+    Container(
             // here
             height: 500,
             alignment: Alignment.centerLeft,
@@ -148,7 +176,29 @@ class _communityCard extends State<communityCard> {
   Widget checkInfo() {
     String theText = "Try Again Please";
     try {
+      setState(() {});
+
+      print("yayeyeyeaaa");
       print(widget.typedLocationList);
+      return Container(
+        padding: EdgeInsets.all(20.0),
+        child: Text(
+          "${widget.typedLocationList[0].first.locality}, ${widget.typedLocationList[0].first.administrativeArea} ${widget.PersonUserName}",
+          textScaleFactor: 3,)
+      );
+    } on Exception catch (_) {
+      return Container(
+        padding: EdgeInsets.all(20.0),
+        child: Text(
+          "Try Again Please",
+          textScaleFactor: 3,
+        ),
+      );
+    }
+  }
+}
+/*
+print(widget.typedLocationList);
       if ((widget.typedLocationList[1]).length == 0) {
         return Container(
           padding: EdgeInsets.all(20.0),
@@ -175,14 +225,4 @@ class _communityCard extends State<communityCard> {
           theText,
           textScaleFactor: 3,
         ),);
-    }
-    on Exception catch (_) {
-      return Container(
-        padding: EdgeInsets.all(20.0),
-        child: Text(
-          "Try Again Please",
-          textScaleFactor: 3,
-        ),);
-    }
-  }
-}
+ */

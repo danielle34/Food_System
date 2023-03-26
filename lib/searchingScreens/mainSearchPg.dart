@@ -83,7 +83,7 @@ class _mainSearchPage extends State<mainSearchPage> {
     return [placemarks,locations ];
 
   }
-  void transferData(theGivenLocation) async {
+  Future transferData(theGivenLocation) async {
     placeData = await getLocation(typedLocation.text);//getLocation(theGivenLocation);
   }
 
@@ -155,13 +155,13 @@ class _mainSearchPage extends State<mainSearchPage> {
             width: 400,
             child: TextButton(
               style: TextButton.styleFrom(backgroundColor: Colors.pink),
-              onPressed: () {
+              onPressed : ()async {
                 //getLocation(typedLocation.text);
 
                 List newReturnList =[];
 
-                transferData(typedLocation.text);
-                Navigator.push(
+                await transferData(typedLocation.text);
+                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>  communityCard(typedLocationList: placeData,PersonUserName: widget.PersonUserName),
