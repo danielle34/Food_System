@@ -26,9 +26,18 @@ class _mainSearchPage extends State<mainSearchPage> {
         desiredAccuracy: LocationAccuracy.high);
     Lati = position.latitude;
     Lani = position.longitude;
-    print((Lati).toString(),"ummmm",(Lani).toString());
+    //print((Lati).toString(),"ummmm",(Lani).toString());
+    print(position);
+    print(Lati);
+    print(Lani);
+    List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
+    print(placemarks);
     //print((position).toString());
-    setState(() {});
+    setState(() {
+      Lati = position.latitude;
+      Lani = position.longitude;
+
+    });
 
   }
 
@@ -96,9 +105,7 @@ class _mainSearchPage extends State<mainSearchPage> {
                 },
                 onChanged: (value) {}),
           ),
-          Container(
-            height: 50,
-          ),
+
           Container(
             padding: EdgeInsets.all(20.0),
             width: 400,
@@ -119,15 +126,23 @@ class _mainSearchPage extends State<mainSearchPage> {
               ),
             ),
           ),
-
+          // Center(
+          //   child: Container(
+          //     padding: EdgeInsets.all(30.0),
+          //     child: Text(
+          //       "${Lati}, ${Lani}",
+          //       textScaleFactor: 3,
+          //     ),
+          //   ),
+          // ),
       Container(
         // here
-        height: 300,
+        height: 500,
         alignment: Alignment.centerLeft,
-        child:           FlutterMap(
+        child: FlutterMap(
           options: MapOptions(
-            center: latLng.LatLng(Lati,Lani),
-            zoom: 9.2,
+            center: latLng.LatLng(37.785834,-122.406417),//(Lati,Lani),//
+            zoom: 15,
           ),
           nonRotatedChildren: [
             AttributionWidget.defaultWidget(
@@ -144,31 +159,7 @@ class _mainSearchPage extends State<mainSearchPage> {
         )
         ,
       ),
-          // FlutterMap(
-          //   options: MapOptions(
-          //     center: latLng.LatLng(51.5, -0.09),
-          //     zoom: 13.0,
-          //   ),
-          //   layers: [
-          //     TileLayerOptions(
-          //         urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          //         subdomains: ['a', 'b', 'c']
-          //     ),
-          //     MarkerLayerOptions(
-          //       markers: [
-          //         Marker(
-          //           width: 80.0,
-          //           height: 80.0,
-          //           point: latLng.LatLng(51.5, -0.09),
-          //           builder: (ctx) =>
-          //               Container(
-          //                 child: FlutterLogo(),
-          //               ),
-          //         ),
-          //       ],
-          //     ),
-          //   ],
-          // )
+        
         ],
       ),
     );
