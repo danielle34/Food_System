@@ -19,8 +19,9 @@ class mainSearchPage extends StatefulWidget {
 class _mainSearchPage extends State<mainSearchPage> {
   double Lati = 0;
   double Lani = 0;
+  final typedLocation = TextEditingController();
 
-  void getLocation() async {
+  void getLocation(String theGivenLocation) async {
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -33,9 +34,13 @@ class _mainSearchPage extends State<mainSearchPage> {
     List<Placemark> placemarks = await placemarkFromCoordinates(Lati,Lani);
     print(placemarks);
     //print((position).toString());
+
+    List<Location> locations = await locationFromAddress(theGivenLocation);
+    print("Address to Lat long ${locations.first.latitude} : ${locations.first.longitude}");
+
     setState(() {
-      Lati = position.latitude;
-      Lani = position.longitude;
+      Lati = locations.first.latitude;
+      Lani = locations.first.longitude;
 
     });
 
@@ -99,11 +104,8 @@ class _mainSearchPage extends State<mainSearchPage> {
                     borderSide: BorderSide(color: Colors.white),
                   ),
                 ),
-                onSubmitted: (value) {
-                  //do not do nothing
-                  //https://stackoverflow.com/questions/54860198/detect-enter-key-press-in-flutter
-                },
-                onChanged: (value) {}),
+              controller: typedLocation,
+                ),
           ),
 
           Container(
@@ -113,7 +115,9 @@ class _mainSearchPage extends State<mainSearchPage> {
               style: TextButton.styleFrom(backgroundColor: Colors.pink),
               onPressed: () {
                 print("pushed");
-                getLocation();
+                getLocation(typedLocation.text);
+
+                //typedLocation
                 setState(() {});
               },
               child: Text(
@@ -159,7 +163,7 @@ class _mainSearchPage extends State<mainSearchPage> {
         )
         ,
       ),
-        
+
         ],
       ),
     );
